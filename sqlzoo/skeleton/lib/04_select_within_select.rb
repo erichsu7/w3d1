@@ -193,7 +193,7 @@ def sparse_continents
     GROUP BY
       continent
     HAVING
-      SUM(population) < 25000000
+      SUM(population) < 250000000
   )
   SQL
 end
@@ -202,5 +202,19 @@ def large_neighbors
   # Some countries have populations more than three times that of any of their
   # neighbors (in the same continent). Give the countries and continents.
   execute(<<-SQL)
+    SELECT
+      name, continent
+    FROM
+      world w
+    WHERE
+      population > ALL(
+        SELECT
+          3 * population
+        FROM
+          world
+        WHERE
+          continent = w.continent AND
+          name != w.name
+      )
   SQL
 end
